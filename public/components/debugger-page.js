@@ -22,17 +22,18 @@ class DebuggerPage extends React.Component {
     savedState = JSON.parse(savedState);
     this.state = savedState;
     this.state.currentStep = this.state.currentStep || 1;
-    this.state.server = this.state.server || 'Auth0';
-    this.state.domain = this.state.domain || 'samples.auth0.com';
-    this.state.authEndpoint = this.state.authEndpoint || 'https://samples.auth0.com/authorize';
-    this.state.tokenEndpoint = this.state.tokenEndpoint || 'https://samples.auth0.com/oauth/token';
+    this.state.server = this.state.server || 'Custom';
+    this.state.domain = this.state.domain || '';
+    this.state.discoveryURL = document.querySelector('input[name=discoveryURL]').value;
+    this.state.authEndpoint = this.state.authEndpoint || '';
+    this.state.tokenEndpoint = this.state.tokenEndpoint || '';
     this.state.tokenKeysEndpoint = this.state.tokenKeysEndpoint || '';
-    this.state.userInfoEndpoint = this.state.userInfoEndpoint || 'https://samples.auth0.com/userinfo';
+    this.state.userInfoEndpoint = this.state.userInfoEndpoint || '';
     this.state.scopes = this.state.scopes || 'openid profile email phone address';
     this.state.stateToken = this.state.stateToken || document.querySelector('input[name=stateToken]').value;
-    this.state.redirectURI = this.state.redirectURI ||  document.querySelector('input[name=redirect-uri]').value;
-    this.state.clientID = this.state.clientID ||  document.querySelector('input[name=auth0ClientID]').value;
-    this.state.clientSecret = this.state.clientSecret ||  document.querySelector('input[name=auth0ClientSecret]').value;
+    this.state.redirectURI = document.querySelector('input[name=redirectURI]').value;
+    this.state.clientID = document.querySelector('input[name=clientID]').value;
+    this.state.clientSecret = document.querySelector('input[name=clientSecret]').value;
     this.state.authCode = this.state.authCode || document.querySelector('input[name=code]').value;
     this.state.idTokenHeader = this.state.idTokenHeader || '';
     this.state.configurationModalOpen = false;
@@ -40,6 +41,11 @@ class DebuggerPage extends React.Component {
     this.state.validated = this.state.validated || false;
     this.state.exchangeResult = this.state.exchangeResult || '';
     this.saveState();
+    console.log(this.state);
+
+    if (this.state.discoveryURL) {
+      this.updateDiscovery(this.state.discoveryURL);
+    }
   }
 
   componentDidMount() {
@@ -64,7 +70,7 @@ class DebuggerPage extends React.Component {
     let newStep = 0;
 
     if (code) {
-      newStep = 2
+      newStep = 2;
       this.setState({
         currentStep: 2,
         authCode: code
@@ -96,7 +102,7 @@ class DebuggerPage extends React.Component {
 
   scrollAnimated(to, duration) {
     var doc = document.documentElement;
-    var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+    var top = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
     var start = top;
     var change = to - start;
     var currentTime = 0;
@@ -165,11 +171,11 @@ class DebuggerPage extends React.Component {
 
     if (event.detail.skipScroll) return;
 
-    setTimeout(function() {
+    setTimeout(function () {
       this.saveState();
 
-      if(this.state.currentStep > 1){
-        this.scrollToCurrentStep()
+      if (this.state.currentStep > 1) {
+        this.scrollToCurrentStep();
       }
     }.bind(this), 250);
   }
@@ -182,22 +188,22 @@ class DebuggerPage extends React.Component {
     return this.scrollAnimated(
       offset(elem).top + scrollOffset,
       600
-    )
+    );
   }
 
-  updateURLs(){
-    if(this.state.server == 'google'){
-      this.updateDiscovery('https://accounts.google.com/.well-known/openid-configuration')
-    } else if (this.state.server == 'Auth0'){
-      this.updateDiscovery('https://' + this.state.domain + '/.well-known/openid-configuration')
+  updateURLs() {
+    if (this.state.server == 'google') {
+      this.updateDiscovery('https://accounts.google.com/.well-known/openid-configuration');
+    } else if (this.state.server == 'Auth0') {
+      this.updateDiscovery('https://' + this.state.domain + '/.well-known/openid-configuration');
     } else {
-      this.updateDiscovery(this.state.discoveryURL)
+      this.updateDiscovery(this.state.discoveryURL);
     }
   }
-  updateDiscovery(documentURL){
-    documentURL = documentURL || this.state.discoveryURL
+  updateDiscovery(documentURL) {
+    documentURL = documentURL || this.state.discoveryURL;
 
-    this.discover(documentURL, function(discovered){
+    this.discover(documentURL, function (discovered) {
       this.setState({
         discoveryURL: documentURL,
         authEndpoint: discovered.authorization_endpoint,
@@ -217,10 +223,10 @@ class DebuggerPage extends React.Component {
       }
     });
 
-    serviceDiscovery.on('success', function(event){
-      let discovered = JSON.parse(event.currentTarget.response)
-      if(cb && typeof cb == 'function') cb(discovered)
-    }.bind(this))
+    serviceDiscovery.on('success', function (event) {
+      let discovered = JSON.parse(event.currentTarget.response);
+      if (cb && typeof cb == 'function') cb(discovered);
+    }.bind(this));
 
     // TODO: Add error case
 
@@ -244,25 +250,25 @@ class DebuggerPage extends React.Component {
   }
 
   deleteAuthState(callback) {
-    this.setState({ currentStep: 1, accessToken: "", authCode: "", idToken: "", idTokenDecoded:"",  idTokenHeader:"", validated: false}, function() {
-      this.saveState()
+    this.setState({ currentStep: 1, accessToken: '', authCode: '', idToken: '', idTokenDecoded: '', idTokenHeader: '', validated: false }, function () {
+      this.saveState();
       callback();
     });
   }
 
   startOver() {
-    this.deleteAuthState(function() {
+    this.deleteAuthState(function () {
       window.dispatchEvent(new CustomEvent('startOver'));
-    })
+    });
   }
 
   logOut() {
-    this.deleteAuthState(function() {
+    this.deleteAuthState(function () {
       window.dispatchEvent(new CustomEvent('logOut'));
       if (this.state.server === 'Auth0') {
         window.location.href = `https://${this.state.domain}/v2/logout?client_id=${this.state.clientID}&returnTo=${encodeURIComponent(window.location.origin)}`;
-      }  
-    }.bind(this))
+      }
+    }.bind(this));
   }
 
   render() {
@@ -272,13 +278,6 @@ class DebuggerPage extends React.Component {
           <div className="container">
             <div className="playground-header">
               <h2 className="playground-header-title">Debugger</h2>
-              <div className="mode-switcher">
-                <label>Mode:</label>
-                <select className="form-control">
-                  <option>OpenID Connect + OAuth2</option>
-                  <option disabled>OpenID Connect (Coming soon)</option>
-                </select>
-              </div>
               <button
                 onClick={ () => { this.openConfigurationModal(true); } }
                 className="playground-header-config btn btn-link"

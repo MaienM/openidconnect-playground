@@ -1,6 +1,5 @@
 import React from 'react';
 import ServerURLs from './server-urls';
-import ClearAllButton from './clear-all-button';
 import ClientInfo from './client-info';
 
 const ConfigurationModal = (props) =>
@@ -40,15 +39,6 @@ const ConfigurationModal = (props) =>
               <button onClick={props.closeModal} className="code-box-btn is-alt">Save</button>
             </p>
           </div>
-        </div>
-
-        <div className="clear-storage-container">
-          <p>
-            Hey, just a friendly note: we store stuff like your keys in
-            LocalStorage so that when you redirect to authenticate, you don’t lose them.
-            You can clear them by clicking on this button:
-          </p>
-          <ClearAllButton />
         </div>
 
       </div>

@@ -20,14 +20,14 @@ class ClientInfo extends React.Component{
         <div className="form-group">
           <label className="col-md-3 col-xs-12 control-label" htmlFor="clientID">OIDC Client ID</label>
           <div className="col-md-9 col-xs-12">
-            <input className="form-control" name="clientID" onChange={this.update} value={this.props.clientID} ref="clientID" />
+            <input className="form-control" name="clientID" disabled="disabled" value={this.props.clientID} ref="clientID" />
           </div>
         </div>
 
         <div className="form-group">
           <label className="col-md-3 col-xs-12 control-label" htmlFor="clientSecret">OIDC Client Secret</label>
           <div className="col-md-9 col-xs-12">
-            <input className="form-control" name="clientSecret" onChange={this.update} value={this.props.clientSecret} ref="clientSecret" />
+            <input className="form-control" name="clientSecret" disabled="disabled" value={this.props.clientSecret} ref="clientSecret" />
           </div>
         </div>
 
