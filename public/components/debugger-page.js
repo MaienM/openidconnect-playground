@@ -250,7 +250,16 @@ class DebuggerPage extends React.Component {
   }
 
   deleteAuthState(callback) {
-    this.setState({ currentStep: 1, accessToken: '', authCode: '', idToken: '', idTokenDecoded: '', idTokenHeader: '', validated: false }, function () {
+    this.setState({
+      currentStep: 1,
+      accessToken: '',
+      refreshToken: '',
+      authCode: '',
+      idToken: '',
+      idTokenDecoded: '',
+      idTokenHeader: '',
+      validated: false,
+    }, function () {
       this.saveState();
       callback();
     });
@@ -339,6 +348,9 @@ class DebuggerPage extends React.Component {
                   ref="step4"
                   startOver={this.startOver}
                   logOut={this.logOut}
+                  accessToken={this.state.accessToken}
+                  refreshToken={this.state.refreshToken}
+                  idToken={this.state.idToken}
                   idTokenDecoded={this.state.idTokenDecoded}
                   isActive={ this.state.currentStep === 4 }
                 />

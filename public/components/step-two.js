@@ -57,6 +57,7 @@ class StepTwo extends React.Component {
       window.dispatchEvent(new CustomEvent('configChange', {
         detail: {
           accessToken: result.access_token,
+          refreshToken: result.refresh_token,
           idToken: result.id_token,
           idTokenHeader: payload,
           skipScroll: true
